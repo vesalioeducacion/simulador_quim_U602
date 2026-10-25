@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio de Bioquímica y Biofísica Médica | UCCuyo</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Outfit & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- KaTeX for Medical LaTeX notation -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Three.js for 3D Protein Structural Visualizations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            accent: {
+              DEFAULT: '#436600',
+              hover: '#344f00',
+              light: '#f4f7ee'
+            },
+            uccnavy: '#0b192c',
+            uccblue: '#1e3e62',
+            uccazure: '#008dda',
+            uccred: '#dc2626',
+            uccgold: '#d97706',
+            medslate: '#0f172a',
+          },
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .text-accent { color: #436600; }
+    .bg-accent { background-color: #436600; }
+    .bg-accent-hover:hover { background-color: #344f00; }
+    .bg-accent-light { background-color: #f4f7ee; }
+    .border-accent { border-color: #436600; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+    .math-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f4f7ee 100%);
+      border-left: 4px solid #436600;
+    }
+    .clinical-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+      border-left: 4px solid #0284c7;
+    }
+
+    /* Custom Range Slider */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 8px;
+      cursor: pointer;
+      background: #cbd5e1;
+      border-radius: 999px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: #436600;
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -6px;
+      box-shadow: 0 2px 5px rgba(67, 102, 0, 0.4);
+      border: 2px solid #ffffff;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      background: #344f00;
+    }
+    .tab-active {
+      background: #436600 !important;
+      color: #ffffff !important;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(67, 102, 0, 0.35);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#f8fafc] text-slate-800 font-sans selection:bg-accent selection:text-white antialiased">
+
+  <!-- CABECERA INSTITUCIONAL VESALIO / UCCUYO -->
+  <header class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-accent flex items-center justify-center text-white font-bold text-xl shadow-md">
+          <i class="fa-solid fa-dna text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold text-gray-800 tracking-wide uppercase">QUÍMICA &amp; BIOQUÍMICA MÉDICA</h1>
+          <p class="text-xs text-gray-500 font-semibold">PreMédico (Facultad de Cs. Médicas - UCCuyo)</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <!-- Botón Guía de Uso -->
+        <button onclick="openTutorial()" class="flex items-center gap-1.5 px-3 py-1.5 bg-accent text-white text-xs font-semibold rounded-lg shadow-sm hover:bg-accent-hover transition">
+          <i class="fa-solid fa-circle-question text-sm"></i>
+          <span>Guía de Uso</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL CON MENÚ LATERAL OFICIAL VESALIO -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col lg:flex-row gap-6">
+
+    <!-- Menú de Navegación Lateral Oficial -->
+    <nav class="w-full lg:w-64 flex flex-row lg:flex-col gap-2 bg-white p-3 rounded-2xl shadow-sm border border-gray-100 overflow-x-auto lg:overflow-x-visible whitespace-nowrap lg:whitespace-normal sticky top-20 h-fit shrink-0">
+      <button onclick="switchModule(1)" id="tab-btn-1" class="tab-btn tab-active text-left py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2.5">
+        <i class="fa-solid fa-microscope w-4 text-center"></i>
+        <span>1. Pilares &amp; Función</span>
+      </button>
+      <button onclick="switchModule(2)" id="tab-btn-2" class="tab-btn text-gray-700 hover:bg-gray-100 text-left py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition flex items-center gap-2.5">
+        <i class="fa-solid fa-cubes-stacked w-4 text-center"></i>
+        <span>2. Estructuras &amp; Falciforme</span>
+      </button>
+      <button onclick="switchModule(3)" id="tab-btn-3" class="tab-btn text-gray-700 hover:bg-gray-100 text-left py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition flex items-center gap-2.5">
+        <i class="fa-solid fa-table-cells w-4 text-center"></i>
+        <span>3. Clasificación</span>
+      </button>
+      <button onclick="switchModule(4)" id="tab-btn-4" class="tab-btn text-gray-700 hover:bg-gray-100 text-left py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition flex items-center gap-2.5">
+        <i class="fa-solid fa-fire-flame-curved w-4 text-center"></i>
+        <span>4. Desnaturalización</span>
+      </button>
+      <button onclick="switchModule(5)" id="tab-btn-5" class="tab-btn text-gray-700 hover:bg-gray-100 text-left py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition flex items-center gap-2.5">
+        <i class="fa-solid fa-user-doctor w-4 text-center"></i>
+        <span>5. Casos Clínicos &amp; Test</span>
+      </button>
+    </nav>
+
+    <!-- Área Dinámica de Contenido de los Módulos -->
+    <div class="flex-1 w-full min-w-0 space-y-6">
+
+    <!-- ========================================================================= -->
+    <!-- MÓDULO 1: FUNDAMENTOS Y LOS CINCO PILARES FUNCIONALES                     -->
+    <!-- ========================================================================= -->
+    <section id="module-1" class="module-section space-y-6">
+      <!-- Banner Didáctico Vesalio -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-wider mb-1">
+            <i class="fa-solid fa-atom"></i> Módulo 1 • Fundamentos Bioquímicos
+          </div>
+          <h2 class="text-2xl font-extrabold text-slate-900">Etimología de Berzelius y Primacía Biológica</h2>
+          <p class="text-slate-600 text-sm mt-1 max-w-3xl">
+            En 1838, a sugerencia de Jöns Jacob Berzelius, Gerardus Mulder acuñó el término derivado del griego <strong class="text-accent font-mono">proteios</strong> (<em class="text-slate-700">"lo primero", "lo principal", "lo fundamental"</em>). Las proteínas representan cuantitativamente más del <span class="latex-inline" data-latex="> 50\%"></span> del peso seco celular total y constituyen la herramienta efectora de la información codificada en el genoma humano.
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3">
+            <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center gap-3">
+              <span class="text-2xl font-black text-accent font-mono">>50%</span>
+              <span class="text-xs text-slate-600 leading-tight">Masa molecular seca en mamíferos.</span>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center gap-3">
+              <span class="text-2xl font-black text-emerald-600 font-mono">20</span>
+              <span class="text-xs text-slate-600 leading-tight">$\alpha$-L-aminoácidos proteinogénicos estándar.</span>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center gap-3">
+              <span class="text-2xl font-black text-amber-600 font-mono">10¹²</span>
+              <span class="text-xs text-slate-600 leading-tight">Aceleración cinética de reacciones vitales.</span>
+            </div>
+          </div>
+        </div>
+        <div class="p-3 bg-accent-light rounded-xl border border-accent/20 text-xs shrink-0 flex items-center gap-3 self-start lg:self-center">
+          <div class="w-9 h-9 rounded-lg bg-accent text-white flex items-center justify-center font-bold text-lg shadow-sm">
+            1
+          </div>
+          <div>
+            <span class="font-bold text-slate-800 block text-xs">Unidad Temática VI</span>
+            <span class="text-slate-500 text-[11px]">Curso de Ingreso a Medicina</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cinco Pilares Funcionales: Selector Interactivo -->
+      <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-shapes text-accent"></i> Los Cinco Pilares Funcionales de las Proteínas
+            </h3>
+            <p class="text-xs text-slate-500">Haga clic en cada pilar fisiopatológico para analizar su correlato molecular y médico.</p>
+          </div>
+          <span class="text-xs bg-accent-light text-accent font-bold px-3 py-1 rounded-full self-start sm:self-auto font-mono">Biofísica de Sistemas</span>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
+          <button onclick="selectPillar(0)" id="p-btn-0" class="pillar-btn p-3 rounded-xl bg-accent-light border-2 border-accent text-accent flex flex-col items-center text-center gap-2 transition shadow-sm font-semibold">
+            <i class="fa-solid fa-bolt text-xl text-amber-500"></i>
+            <span class="text-xs">1. Catálisis</span>
+          </button>
+          <button onclick="selectPillar(1)" id="p-btn-1" class="pillar-btn p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 flex flex-col items-center text-center gap-2 transition hover:bg-slate-100 font-medium">
+            <i class="fa-solid fa-shield-virus text-xl text-emerald-600"></i>
+            <span class="text-xs">2. Inmunología</span>
+          </button>
+          <button onclick="selectPillar(2)" id="p-btn-2" class="pillar-btn p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 flex flex-col items-center text-center gap-2 transition hover:bg-slate-100 font-medium">
+            <i class="fa-solid fa-truck-droplet text-xl text-rose-600"></i>
+            <span class="text-xs">3. Transporte Gas</span>
+          </button>
+          <button onclick="selectPillar(3)" id="p-btn-3" class="pillar-btn p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 flex flex-col items-center text-center gap-2 transition hover:bg-slate-100 font-medium">
+            <i class="fa-solid fa-bone text-xl text-blue-600"></i>
+            <span class="text-xs">4. Estructura &amp; Motilidad</span>
+          </button>
+          <button onclick="selectPillar(4)" id="p-btn-4" class="pillar-btn p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 flex flex-col items-center text-center gap-2 transition hover:bg-slate-100 font-medium col-span-2 sm:col-span-1">
+            <i class="fa-solid fa-envelope-open-text text-xl text-purple-600"></i>
+            <span class="text-xs">5. Endocrinología</span>
+          </button>
+        </div>
+
+        <!-- Panel de detalle del Pilar Seleccionado -->
+        <div id="pillar-content" class="bg-slate-50 border border-slate-200 rounded-xl p-5 transition-all duration-300">
+          <!-- Dinámico mediante JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- MÓDULO 2: ENLACE PEPTÍDICO Y JERARQUÍA ESTRUCTURAL                        -->
+    <!-- ========================================================================= -->
+    <section id="module-2" class="module-section hidden space-y-6">
+      
+      <!-- Submódulo 2A: La Química y Resonancia del Enlace Peptídico -->
+      <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-link text-accent"></i> Química Cuántica del Enlace Peptídico: Resonancia y Rigidez Coplanar
+          </h3>
+          <span class="text-xs font-mono bg-accent-light text-accent px-3 py-1 rounded-md border border-accent/20 font-bold">Linus Pauling &amp; Corey</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+          <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
+            <p>
+              El enlace peptídico se sintetiza mediante una <strong class="text-slate-900">reacción de condensación con pérdida de una molécula de agua</strong> (<span class="latex-inline" data-latex="\text{H}_2\text{O}"></span>) entre el grupo carboxilo (<span class="latex-inline" data-latex="-\text{COOH}"></span>) del aminoácido <span class="latex-inline" data-latex="i"></span> y el grupo amino (<span class="latex-inline" data-latex="-\text{NH}_2"></span>) del aminoácido <span class="latex-inline" data-latex="i+1"></span>, originando un enlace amida sustituido.
+            </p>
+            <div class="math-card p-4 rounded-xl border border-slate-200 space-y-2">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block">Mecanismo de Deslocalización Electrónica:</span>
+              <div class="text-center py-2 text-base font-mono text-slate-800">
+                <span class="latex-inline" data-latex="\text{R}_1\text{-COOH} + \text{H}_2\text{N-R}_2 \rightleftharpoons \text{R}_1\text{-CO-NH-R}_2 + \text{H}_2\text{O}"></span>
+              </div>
+              <p class="text-xs text-slate-600">
+                El par libre de electrones del nitrógeno amídico interactúa con el orbital <span class="latex-inline" data-latex="\pi"></span> del carbonilo. Esto otorga al enlace <span class="latex-inline" data-latex="\text{C}-\text{N}"></span> un <strong class="text-accent font-bold">40% de carácter de doble enlace parcial</strong>.
+              </p>
+            </div>
+            <div class="p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-xl text-xs space-y-1">
+              <span class="font-bold text-amber-900 flex items-center gap-1.5">
+                <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Consecuencia Estructural Médica Clave:
+              </span>
+              <p class="text-slate-700">
+                No existe rotación libre en el enlace peptídico (<span class="latex-inline" data-latex="\omega \approx 180^\circ"></span>, configuración <em>trans</em> coplanar). Toda la flexibilidad del esqueleto proteico queda restringida exclusivamente a los ángulos diedros <span class="latex-inline" data-latex="\phi"></span> (enlace <span class="latex-inline" data-latex="\text{N}-\text{C}_\alpha"></span>) y <span class="latex-inline" data-latex="\psi"></span> (enlace <span class="latex-inline" data-latex="\text{C}_\alpha-\text{C}"></span>), base del diagrama de Ramachandran.
+              </p>
+            </div>
+          </div>
+
+          <!-- Esquema interactivo de resonancia del enlace -->
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 text-center space-y-4">
+            <h4 class="text-xs font-bold text-slate-500 tracking-wider uppercase">Diagrama Dinámico de Formas Resonantes</h4>
+            <div class="flex items-center justify-center gap-3 text-xs sm:text-sm font-mono overflow-x-auto py-4">
+              <div class="p-3 bg-white rounded-lg border border-slate-200 shadow-sm">
+                <div class="text-slate-500 text-xs">Forma Neutra (Mayoritaria)</div>
+                <div class="text-accent text-base font-bold my-1">
+                  <span class="latex-inline" data-latex="-\text{C}(=\text{O})-\text{NH}-"></span>
+                </div>
+                <div class="text-[10px] text-slate-400">C-N simple: 1.49 Å</div>
+              </div>
+              <div class="text-slate-400 text-xl font-bold">
+                <span class="latex-inline" data-latex="\longleftrightarrow"></span>
+              </div>
+              <div class="p-3 bg-white rounded-lg border border-accent/40 shadow-sm">
+                <div class="text-accent text-xs font-semibold">Forma Dipolar Zwitteriónica</div>
+                <div class="text-amber-700 text-base font-bold my-1">
+                  <span class="latex-inline" data-latex="-\text{C}(\text{-O}^-)=\text{NH}^+-"></span>
+                </div>
+                <div class="text-[10px] text-emerald-600 font-semibold">C=N doble: 1.32 Å (Rígido)</div>
+              </div>
+            </div>
+            <div class="text-left text-xs bg-white p-3 rounded-lg border border-slate-200 flex items-center justify-between">
+              <span class="text-slate-600">Longitud real observada por Difracción de Rayos X:</span>
+              <span class="font-mono font-bold text-accent bg-accent-light px-2 py-0.5 rounded border border-accent/30">1.33 Å (Intermedio)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submódulo 2B: Simulador 3D / Interactivo de los 4 Niveles Estructurales -->
+      <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+        <div class="border-b border-slate-100 pb-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-layer-group text-accent"></i> Jerarquía de Niveles Estructurales
+            </h3>
+            <p class="text-xs text-slate-500">Explore la organización desde la secuencia lineal hasta el ensamblaje multimérico alostérico.</p>
+          </div>
+          <!-- Botonera de Niveles -->
+          <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+            <button onclick="setLevel(1)" id="lvl-btn-1" class="lvl-btn bg-accent text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">1° Primaria</button>
+            <button onclick="setLevel(2)" id="lvl-btn-2" class="lvl-btn text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-lg text-xs font-semibold transition">2° Secundaria</button>
+            <button onclick="setLevel(3)" id="lvl-btn-3" class="lvl-btn text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-lg text-xs font-semibold transition">3° Terciaria</button>
+            <button onclick="setLevel(4)" id="lvl-btn-4" class="lvl-btn text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-lg text-xs font-semibold transition">4° Cuaternaria</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Visualizador Canvas 3D de Estructura -->
+          <div class="lg:col-span-7 bg-slate-950 rounded-2xl border border-slate-800 p-4 flex flex-col justify-between relative overflow-hidden h-[420px]">
+            <div class="flex items-center justify-between z-10">
+              <span id="canvas-tag" class="text-xs font-mono px-2.5 py-1 rounded bg-slate-900 border border-slate-700 text-cyan-400">
+                Visualización Tridimensional: Estructura Primaria
+              </span>
+              <button onclick="resetCamera3D()" class="text-xs text-slate-300 hover:text-white bg-slate-800 px-2 py-1 rounded border border-slate-700 transition">
+                <i class="fa-solid fa-arrows-rotate"></i> Centrar
+              </button>
+            </div>
+            
+            <div id="three-container" class="w-full h-full absolute inset-0 cursor-grab active:cursor-grabbing"></div>
+            
+            <div class="z-10 bg-slate-900/85 backdrop-blur p-2 rounded-xl text-center text-slate-300 text-xs flex justify-around">
+              <span><i class="fa-solid fa-computer-mouse text-cyan-400"></i> Arrastre para rotar vista</span>
+              <span><i class="fa-solid fa-magnifying-glass text-cyan-400"></i> Rueda para zoom</span>
+            </div>
+          </div>
+
+          <!-- Explicación pedagógica del nivel seleccionado -->
+          <div id="level-detail-box" class="lg:col-span-5 bg-slate-50 rounded-2xl border border-slate-200 p-6 flex flex-col justify-between space-y-4">
+            <!-- Rellenado dinámicamente con JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Submódulo 2C: Simulador de Patología Molecular: Anemia Falciforme (HbA vs HbS) -->
+      <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold uppercase tracking-wider mb-2">
+              <i class="fa-solid fa-dna"></i> Caso Paradigmático de la Medicina Molecular
+            </div>
+            <h3 class="text-xl sm:text-2xl font-black text-slate-900">
+              Anemia de Células Falciformes: Efecto de una Mutación Puntual
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-600">
+              Correlación directa entre la alteración en estructura primaria y el colapso funcional microcirculatorio.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-slate-500">Oxigenación Capilar:</span>
+            <button onclick="toggleOxygenation()" id="btn-oxy" class="px-3 py-1.5 rounded-lg bg-accent text-white font-semibold text-xs flex items-center gap-2 hover:bg-accent-hover transition shadow">
+              <i class="fa-solid fa-lungs"></i> <span id="oxy-label">Estado Oxigenado (Pulmón)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Contraste de Genética y Bioquímica Glu6 vs Val6 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sm text-accent">Hemoglobina Normal (<span class="latex-inline" data-latex="\text{HbA}"></span>)</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 font-mono font-semibold">Fisiológico</span>
+            </div>
+            <div class="text-xs space-y-1.5 text-slate-700">
+              <p>• Gen codificante: Cadena <span class="latex-inline" data-latex="\beta"></span> con codón <strong class="text-slate-900 font-mono">GAG</strong>.</p>
+              <p>• Posición 6 de la cadena <span class="latex-inline" data-latex="\beta"></span>: <strong class="text-emerald-700 font-bold"><span class="latex-inline" data-latex="\text{Glu6}"></span> (Ácido Glutámico)</strong>.</p>
+              <p>• Propiedad fisicoquímica del grupo <span class="latex-inline" data-latex="\text{R}"></span>: Polar, hidrofílico, ionizado negativamente (<span class="latex-inline" data-latex="-\text{COO}^-"></span> a pH 7.4). Soluble en el citosol acuoso.</p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sm text-rose-700">Hemoglobina Falciforme (<span class="latex-inline" data-latex="\text{HbS}"></span>)</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-300 font-mono font-semibold">Mutación Transversión</span>
+            </div>
+            <div class="text-xs space-y-1.5 text-slate-700">
+              <p>• Mutación puntual: <strong class="text-amber-700 font-mono">GAG $\to$ GTG</strong> en el ADN (Adenina por Timina).</p>
+              <p>• Sustitución aminoacídica: <strong class="text-rose-700 font-bold"><span class="latex-inline" data-latex="\text{Val6}"></span> (Valina)</strong> en posición 6.</p>
+              <p>• Propiedad fisicoquímica del grupo <span class="latex-inline" data-latex="\text{R}"></span>: Cadena hidrocarbonada apolar, altamente hidrofóbica.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simulador interactivo en Canvas 2D: Capilar y Vasooclusión -->
+        <div class="bg-slate-50 rounded-2xl border border-slate-200 p-4 space-y-3">
+          <div class="flex flex-wrap items-center justify-between text-xs">
+            <div class="flex items-center gap-3">
+              <span class="font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-microscope text-accent"></i> Simulación Hemorreológica en Microcapilar (<span class="latex-inline" data-latex="\phi \approx 7\,\mu\text{m}"></span>)
+              </span>
+              <span id="sickle-status" class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 font-mono font-semibold">Flujo Laminar Libre</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="setSickleMode('HbA')" id="btn-mode-hba" class="px-2.5 py-1 rounded bg-white text-accent border border-accent font-semibold hover:bg-accent-light shadow-sm">Test HbA</button>
+              <button onclick="setSickleMode('HbS')" id="btn-mode-hbs" class="px-2.5 py-1 rounded bg-white text-slate-600 border border-slate-300 font-semibold hover:text-slate-900 shadow-sm">Test HbS (Mutada)</button>
+            </div>
+          </div>
+
+          <canvas id="capillaryCanvas" class="w-full h-48 bg-[#060b13] rounded-xl border border-slate-800 block"></canvas>
+
+          <!-- Cascada fisiopatológica dinámica -->
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs pt-1">
+            <div class="p-2.5 rounded-lg bg-white border border-slate-200 shadow-sm">
+              <span class="text-accent font-bold block mb-1">1. Desoxigenación</span>
+              <span class="text-slate-600">En tejidos periféricos, la desoxigenación expone el parche apolar de <span class="latex-inline" data-latex="\text{Val6}"></span>.</span>
+            </div>
+            <div class="p-2.5 rounded-lg bg-white border border-slate-200 shadow-sm">
+              <span class="text-amber-600 font-bold block mb-1">2. Polimerización</span>
+              <span class="text-slate-600">Los parches hidrofóbicos interactúan, formando filamentos rígidos insolubles de 14 cadenas de <span class="latex-inline" data-latex="\text{HbS}"></span>.</span>
+            </div>
+            <div class="p-2.5 rounded-lg bg-white border border-slate-200 shadow-sm">
+              <span class="text-rose-600 font-bold block mb-1">3. Deformación Drepanocítica</span>
+              <span class="text-slate-600">El glóbulo rojo pierde su elasticidad bicóncava y adopta forma semilunar ("hoz").</span>
+            </div>
+            <div class="p-2.5 rounded-lg bg-white border border-slate-200 shadow-sm">
+              <span class="text-rose-800 font-bold block mb-1">4. Crisis Vasooclusiva</span>
+              <span class="text-slate-600">Atascamiento en lechos capilares, isquemia tisular, dolor agudo y hemólisis intravascular.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- MÓDULO 3: CLASIFICACIÓN GENERAL DE LAS PROTEÍNAS                          -->
+    <!-- ========================================================================= -->
+    <section id="module-3" class="module-section hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-wider mb-1">
+            <i class="fa-solid fa-shapes"></i> Módulo 3 • Clasificación Taxonómica
+          </div>
+          <h2 class="text-2xl font-extrabold text-slate-900">Taxonomía Estructural y Composición Molecular</h2>
+          <p class="text-slate-600 text-sm mt-1 max-w-3xl">
+            Clasificación sistemática de las proteínas según su relación axial tridimensional (fibrosas insolubles vs. globulares dinámicas) y su constitución química pura o conjugada con grupos prostéticos.
+          </p>
+        </div>
+        <div class="p-3 bg-accent-light rounded-xl border border-accent/20 text-xs shrink-0 flex items-center gap-3 self-start lg:self-center">
+          <div class="w-9 h-9 rounded-lg bg-accent text-white flex items-center justify-center font-bold text-lg shadow-sm">
+            3
+          </div>
+          <div>
+            <span class="font-bold text-slate-800 block text-xs">Unidad Temática VI</span>
+            <span class="text-slate-500 text-[11px]">Curso de Ingreso a Medicina</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Criterio 1: Por su conformación tridimensional (Fibrosas vs Globulares) -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-shapes text-accent"></i> Criterio A: Por Forma Tridimensional Global
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Fibrosas -->
+          <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <h4 class="text-lg font-bold text-amber-800 flex items-center gap-2">
+                <i class="fa-solid fa-bars-staggered text-amber-600"></i> Proteínas Fibrosas (Escleroproteínas)
+              </h4>
+              <span class="text-xs bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded font-mono font-semibold">Insolubles</span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Cadenas polipeptídicas extendidas a lo largo de un eje unidimensional. Poseen una relación axial (largo/ancho) superior a 10. Son insolubles en agua y altamente resistentes a fuerzas de tensión mecánica.
+            </p>
+            <div class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+              <div class="flex justify-between border-b border-slate-200 pb-1.5">
+                <span class="text-slate-700 font-semibold">Colágeno:</span>
+                <span class="text-slate-600">Triple hélice rica en prolina y glicina. Resistencia de tendones y cartílagos.</span>
+              </div>
+              <div class="flex justify-between border-b border-slate-200 pb-1.5">
+                <span class="text-slate-700 font-semibold"><span class="latex-inline" data-latex="\alpha"></span>-Queratina:</span>
+                <span class="text-slate-600">Rica en cisteína y puentes disulfuro. Presente en epidermis, uñas y cabello.</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-700 font-semibold">Elastina:</span>
+                <span class="text-slate-600">Redes deformables con enlaces cruzados de desmosina en paredes arteriales.</span>
+              </div>
+            </div>
+            <div class="text-[11px] text-amber-900 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+              <i class="fa-solid fa-stethoscope mr-1 text-amber-600"></i> <strong>Relevancia Médica UCCuyo:</strong> Su función es primordialmente estática, de soporte estructural y protección tisular externa.
+            </div>
+          </div>
+
+          <!-- Globulares -->
+          <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <h4 class="text-lg font-bold text-accent flex items-center gap-2">
+                <i class="fa-solid fa-circle-nodes text-accent"></i> Proteínas Globulares (Esferoproteínas)
+              </h4>
+              <span class="text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-mono font-semibold">Solubles</span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Cadenas polipeptídicas plegadas estrechamente formando estructuras esferoidales o elipsoidales compactas. Relación axial menor a 3-4. Solubles en medios acuosos debido a la exposición superficial de residuos polares.
+            </p>
+            <div class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+              <div class="flex justify-between border-b border-slate-200 pb-1.5">
+                <span class="text-slate-700 font-semibold">Enzimas:</span>
+                <span class="text-slate-600">Hexoquinasa, amilasa, pepsina (catálisis metabólica con bolsillo activo).</span>
+              </div>
+              <div class="flex justify-between border-b border-slate-200 pb-1.5">
+                <span class="text-slate-700 font-semibold">Proteínas Plasmáticas:</span>
+                <span class="text-slate-600">Albúmina (presión oncótica intravascular y transporte de fármacos/ácidos grasos).</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-700 font-semibold">Inmunoglobulinas:</span>
+                <span class="text-slate-600">Anticuerpos con conformación globular para dispersión en linfa y plasma.</span>
+              </div>
+            </div>
+            <div class="text-[11px] text-emerald-900 bg-emerald-50 p-2.5 rounded-lg border border-emerald-200">
+              <i class="fa-solid fa-stethoscope mr-1 text-emerald-600"></i> <strong>Relevancia Médica UCCuyo:</strong> Ejecutan las funciones biológicas dinámicas: transporte, catálisis, señalización y defensa inmune.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Criterio 2: Por su Composición Química (Simples vs Conjugadas) -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-flask-vial text-accent"></i> Criterio B: Por Composición Química y Grupo Prostético
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Simples -->
+          <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <h4 class="text-base font-bold text-slate-900 flex items-center justify-between">
+              <span>Proteínas Simples (Holoproteínas)</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">100% Aminoacídicas</span>
+            </h4>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Formadas exclusivamente por polímeros de <span class="latex-inline" data-latex="\alpha"></span>-aminoácidos. Tras su hidrólisis ácida o enzimática exhaustiva, únicamente rinden aminoácidos libres sin ningún componente no proteico remanente.
+            </p>
+            <ul class="text-xs space-y-2 text-slate-700 list-disc list-inside bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <li><strong class="text-slate-900">Seroalbúmina humana:</strong> Principal proteína circulante del plasma.</li>
+              <li><strong class="text-slate-900">Insulina nativa:</strong> Hormona polipeptídica de dos cadenas unidas por disulfuros.</li>
+              <li><strong class="text-slate-900">Ribonucleasa A:</strong> Enzima catalítica puramente aminoacídica.</li>
+            </ul>
+          </div>
+
+          <!-- Conjugadas -->
+          <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <h4 class="text-base font-bold text-slate-900 flex items-center justify-between">
+              <span>Proteínas Conjugadas (Heteroproteínas)</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-200 font-semibold">Apoproteína + Grupo Prostético</span>
+            </h4>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Requieren una porción no aminoacídica covalentemente o fuertemente ligada llamada <strong class="text-accent font-bold">grupo prostético</strong>. La porción proteica pura sin su grupo se denomina <em>apoproteína</em> (biológicamente inactiva).
+            </p>
+            <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <div class="p-2 bg-white rounded border border-slate-200 shadow-sm">
+                <span class="text-accent font-semibold block">Glucoproteínas</span>
+                <span class="text-slate-500 text-[11px]">Glúcidos unidos (ej. Inmunoglobulinas, TSH).</span>
+              </div>
+              <div class="p-2 bg-white rounded border border-slate-200 shadow-sm">
+                <span class="text-amber-700 font-semibold block">Lipoproteínas</span>
+                <span class="text-slate-500 text-[11px]">Lípidos (ej. Quilomicrones, LDL, HDL).</span>
+              </div>
+              <div class="p-2 bg-white rounded border border-slate-200 shadow-sm">
+                <span class="text-rose-700 font-semibold block">Hemoproteínas</span>
+                <span class="text-slate-500 text-[11px]">Anillo de Porfirina con <span class="latex-inline" data-latex="\text{Fe}^{2+}"></span> (Hb, Mioglobina).</span>
+              </div>
+              <div class="p-2 bg-white rounded border border-slate-200 shadow-sm">
+                <span class="text-emerald-700 font-semibold block">Metaloproteínas</span>
+                <span class="text-slate-500 text-[11px]">Iones metálicos cofactores (<span class="latex-inline" data-latex="\text{Zn}^{2+}, \text{Cu}^{2+}"></span>).</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- MÓDULO 4: DESNATURALIZACIÓN Y MATRIZ DE AGENTES FISICOQUÍMICOS            -->
+    <!-- ========================================================================= -->
+    <section id="module-4" class="module-section hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 text-rose-700 text-xs font-bold uppercase tracking-wider mb-1">
+            <i class="fa-solid fa-fire-flame-curved"></i> Módulo 4 • Fenomenología del Plegamiento
+          </div>
+          <h2 class="text-2xl font-extrabold text-slate-900">Desnaturalización Proteica: Fenomenología y Cinética</h2>
+          <p class="text-slate-600 text-sm mt-1 max-w-3xl">
+            La desnaturalización es la <strong class="text-slate-900">pérdida de la conformación nativa tridimensional</strong> (estructuras secundaria, terciaria y cuaternaria) producida por perturbaciones ambientales. <strong class="text-rose-700 underline decoration-rose-500">La estructura primaria se mantiene 100% íntegra</strong>: los enlaces peptídicos covalentes no se hidrolizan por calor o agentes desnaturalizantes ordinarios.
+          </p>
+        </div>
+        <div class="p-3 bg-accent-light rounded-xl border border-accent/20 text-xs shrink-0 flex items-center gap-3 self-start lg:self-center">
+          <div class="w-9 h-9 rounded-lg bg-accent text-white flex items-center justify-center font-bold text-lg shadow-sm">
+            4
+          </div>
+          <div>
+            <span class="font-bold text-slate-800 block text-xs">Unidad Temática VI</span>
+            <span class="text-slate-500 text-[11px]">Curso de Ingreso a Medicina</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Simulador de Desnaturalización Interactiva -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-7 glass-card rounded-2xl border border-slate-200 p-5 space-y-3 flex flex-col justify-between shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-accent bg-accent-light px-3 py-1 rounded border border-accent/20 font-semibold">
+              Simulador Visual de Plegamiento vs Desplegamiento
+            </span>
+            <span id="denature-tag" class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
+              Estado: Conformación Nativa Funcional
+            </span>
+          </div>
+
+          <!-- Canvas 2D de Desnaturalización interactiva -->
+          <canvas id="denatureCanvas" class="w-full h-64 bg-[#050a12] rounded-xl border border-slate-800 block"></canvas>
+
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2 w-2/3">
+              <label for="stress-slider" class="text-xs text-slate-600 whitespace-nowrap font-medium">Energía de Perturbación:</label>
+              <input id="stress-slider" type="range" min="0" max="100" value="0" oninput="updateDenaturation(this.value)" class="w-full">
+            </div>
+            <button onclick="resetDenaturation()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition border border-slate-200">
+              Renaturalizar
+            </button>
+          </div>
+        </div>
+
+        <!-- Matriz de Consecuencias Biofísicas -->
+        <div class="lg:col-span-5 glass-card rounded-2xl border border-slate-200 p-6 flex flex-col justify-between space-y-3 shadow-sm">
+          <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">
+            Cascada de Eventos Fisicoquímicos
+          </h4>
+          <div class="space-y-3 text-xs">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="font-bold text-amber-700 block mb-1">1. Ruptura de Enlaces Débiles</span>
+              <p class="text-slate-600">Desaparición de puentes de hidrógeno, interacciones electrostáticas y fuerzas de Van der Waals que estabilizaban hélices <span class="latex-inline" data-latex="\alpha"></span> y hojas <span class="latex-inline" data-latex="\beta"></span>.</p>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="font-bold text-accent block mb-1">2. Exposición del Núcleo Hidrofóbico</span>
+              <p class="text-slate-600">Los residuos apolares (<span class="latex-inline" data-latex="\text{Leu, Ile, Val, Phe}"></span>), antes secuestrados en el centro de la proteína globular, contactan con el agua circundante.</p>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="font-bold text-rose-700 block mb-1">3. Agregación Insoluble y Precipitación</span>
+              <p class="text-slate-600">Las cadenas desplegadas entrelazan sus parches hidrofóbicos al azar formando masas coloidales insolubles sin función biológica.</p>
+            </div>
+          </div>
+          <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-[11px]">
+            <i class="fa-solid fa-circle-exclamation mr-1 text-rose-600"></i> <strong>Punto Crítico de Examen UCCuyo:</strong> "¿Se altera la estructura primaria durante la fiebre o cocción?" <strong>Respuesta: NO.</strong> Requiere enzimas proteolíticas o <span class="latex-inline" data-latex="\text{HCl}\;6\,\text{N}"></span> a <span class="latex-inline" data-latex="110^\circ\text{C}"></span> durante 24 horas.
+          </div>
+        </div>
+      </div>
+
+      <!-- Matriz de Agentes Fisicoquímicos Interactivas -->
+      <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-table-list text-accent"></i> Matriz Comparativa de Agentes Desnaturalizantes Médicos
+        </h3>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Agente 1: Calor -->
+          <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5 hover:border-amber-400 transition">
+            <div class="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-700">
+              <i class="fa-solid fa-temperature-arrow-up text-lg"></i>
+            </div>
+            <h5 class="font-bold text-slate-900 text-sm">Calor y Radiación UV</h5>
+            <p class="text-xs text-slate-600">Aumenta la energía cinética térmica molecular, produciendo vibraciones violentas que disrumpen los puentes de H intermedios.</p>
+            <span class="inline-block text-[11px] font-mono text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-200 font-semibold">Autoclave / Esterilización</span>
+          </div>
+
+          <!-- Agente 2: pH Extremo -->
+          <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5 hover:border-blue-400 transition">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 border border-blue-200 flex items-center justify-center text-accentCyan">
+              <i class="fa-solid fa-vial-circle-check text-lg"></i>
+            </div>
+            <h5 class="font-bold text-slate-900 text-sm">Ácidos y Bases Fuertes</h5>
+            <p class="text-xs text-slate-600">Modifican el estado de ionización de los grupos <span class="latex-inline" data-latex="-\text{COO}^-"></span> y <span class="latex-inline" data-latex="-\text{NH}_3^+"></span>, aniquilando los puentes salinos electrostáticos.</p>
+            <span class="inline-block text-[11px] font-mono text-blue-800 bg-blue-100 px-2 py-0.5 rounded border border-blue-200 font-semibold">Pepsina gástrica / pH 1.5</span>
+          </div>
+
+          <!-- Agente 3: Solventes Orgánicos -->
+          <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5 hover:border-purple-400 transition">
+            <div class="w-10 h-10 rounded-xl bg-purple-100 border border-purple-200 flex items-center justify-center text-purple-700">
+              <i class="fa-solid fa-bottle-droplet text-lg"></i>
+            </div>
+            <h5 class="font-bold text-slate-900 text-sm">Solventes Orgánicos</h5>
+            <p class="text-xs text-slate-600">Disminuyen la constante dieléctrica del medio, disuelven el interior apolar e intercalan moléculas polares anómalas.</p>
+            <span class="inline-block text-[11px] font-mono text-purple-800 bg-purple-100 px-2 py-0.5 rounded border border-purple-200 font-semibold">Alcohol etílico al 70%</span>
+          </div>
+
+          <!-- Agente 4: Metales Pesados -->
+          <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5 hover:border-rose-400 transition">
+            <div class="w-10 h-10 rounded-xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-700">
+              <i class="fa-solid fa-skull text-lg"></i>
+            </div>
+            <h5 class="font-bold text-slate-900 text-sm">Metales Pesados (<span class="latex-inline" data-latex="\text{Hg}^{2+}, \text{Pb}^{2+}"></span>)</h5>
+            <p class="text-xs text-slate-600">Extrema afinidad electrofílica por sulfhidrilos (<span class="latex-inline" data-latex="-\text{SH}"></span>); destruyen puentes disulfuro covalentes (<span class="latex-inline" data-latex="-\text{S}-\text{S}-"></span>).</p>
+            <span class="inline-block text-[11px] font-mono text-rose-800 bg-rose-100 px-2 py-0.5 rounded border border-rose-200 font-semibold">Intoxicación ocupacional</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- MÓDULO 5: CASOS CLÍNICOS Y TALLER DE EVALUACIÓN                           -->
+    <!-- ========================================================================= -->
+    <section id="module-5" class="module-section hidden space-y-6">
+      
+      <!-- Submódulo 5A: Casos Clínicos Aplicados -->
+      <div class="space-y-6">
+        <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-wider mb-1">
+              <i class="fa-solid fa-user-doctor"></i> Módulo 5 • Integración Clínico-Química
+            </div>
+            <h2 class="text-2xl font-extrabold text-slate-900">
+              Taller de Razonamiento Clínico y Bioquímica Médica
+            </h2>
+            <p class="text-slate-600 text-sm mt-1 max-w-3xl">
+              Aplicación de principios termodinámicos y conformacionales a situaciones clínicas de antisepsia quirúrgica, toxicología de urgencia y autoevaluación diagnóstica para el aspirante a Medicina.
+            </p>
+          </div>
+          <div class="p-3 bg-accent-light rounded-xl border border-accent/20 text-xs shrink-0 flex items-center gap-3 self-start lg:self-center">
+            <div class="w-9 h-9 rounded-lg bg-accent text-white flex items-center justify-center font-bold text-lg shadow-sm">
+              5
+            </div>
+            <div>
+              <span class="font-bold text-slate-800 block text-xs">Unidad Temática VI</span>
+              <span class="text-slate-500 text-[11px]">Curso de Ingreso a Medicina</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Caso Clínico 1: El Dilema del Alcohol 70% vs 100% -->
+        <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span class="text-xs font-mono text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-200 font-semibold">Caso 1: Asepsia Quirúrgica</span>
+              <h3 class="text-lg sm:text-xl font-bold text-slate-900 mt-1">
+                ¿Por qué se utiliza Etanol al 70% en vez de Etanol Puro al 100% en Antisepsia?
+              </h3>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="simulateAlcohol(70)" id="btn-alc-70" class="px-3 py-1.5 rounded-lg bg-accent text-white font-bold text-xs hover:bg-accent-hover transition shadow">Probar Alcohol 70%</button>
+              <button onclick="simulateAlcohol(100)" id="btn-alc-100" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition border border-slate-200">Probar Alcohol 100%</button>
+            </div>
+          </div>
+
+          <!-- Canvas interactivo de Bacteria y Penetración de Alcohol -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            <div class="md:col-span-6 bg-slate-950 rounded-xl p-3 border border-slate-800 text-center">
+              <canvas id="bacterialCanvas" class="w-full h-56 bg-[#040810] rounded-lg block"></canvas>
+              <div id="bacterial-status" class="mt-2 text-xs font-mono text-cyan-400">
+                Seleccione una concentración de alcohol para simular la acción microbicida.
+              </div>
+            </div>
+
+            <div class="md:col-span-6 space-y-3 text-xs sm:text-sm text-slate-700 leading-relaxed">
+              <div class="p-3.5 rounded-xl bg-rose-50 border border-rose-200 space-y-1">
+                <span class="font-bold text-rose-800 flex items-center gap-1.5">
+                  <i class="fa-solid fa-xmark text-rose-600"></i> Etanol Puro al 100% (Efecto Paradójico):
+                </span>
+                <p class="text-xs text-slate-600">
+                  Deshidrata violentamente y produce una coagulación superficial instantánea de las proteínas de la pared y membrana externa bacteriana. Esto forma una <strong class="text-slate-900">coraza impermeable protectora ("costra proteica")</strong> que impide la difusión del etanol hacia el citoplasma. La bacteria queda en estado de latencia pero viva.
+                </p>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-accent-light border border-accent/20 space-y-1">
+                <span class="font-bold text-accent flex items-center gap-1.5">
+                  <i class="fa-solid fa-check text-accent"></i> Etanol al 70% v/v (Solución Hidroalcohólica Óptima):
+                </span>
+                <p class="text-xs text-slate-700">
+                  La presencia del <span class="latex-inline" data-latex="30\%"></span> de agua retrasa la evaporación y la coagulación periférica, manteniendo abiertos los poros transmembrana. Permite la <strong class="text-slate-900">difusión transmembrana completa al citosol</strong>, provocando la desnaturalización masiva irreversible de las enzimas metabólicas vitales y lisis bacteriana.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Caso Clínico 2: Toxicología de Urgencia y la Ovoalbúmina -->
+        <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <span class="text-xs font-mono text-purple-800 bg-purple-100 px-2 py-0.5 rounded border border-purple-200 font-semibold">Caso 2: Toxicología Médica Prehospitalaria</span>
+              <h3 class="text-lg sm:text-xl font-bold text-slate-900 mt-1">
+                Antídoto de Sacrificio: Clara de Huevo Cruda en Intoxicaciones por Mercurio o Plomo
+              </h3>
+            </div>
+            <i class="fa-solid fa-egg text-2xl text-amber-500"></i>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+              <span class="text-accent font-bold block text-sm">1. El Tóxico Circulante</span>
+              <p class="text-slate-600">
+                La ingesta accidental o deliberada de sales de <span class="latex-inline" data-latex="\text{HgCl}_2"></span> o sales de <span class="latex-inline" data-latex="\text{Pb}^{2+}"></span> libera cationes divalentes que atacan los grupos tiol (<span class="latex-inline" data-latex="-\text{SH}"></span>) de enzimas mitocondriales y de la mucosa gástrica.
+              </p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+              <span class="text-amber-700 font-bold block text-sm">2. El Agente de Sacrificio</span>
+              <p class="text-slate-600">
+                La clara de huevo cruda contiene alta concentración de <strong class="text-slate-900">ovoalbúmina</strong> rica en cisteínas libres. Al suministrarse inmediatamente, ofrece millones de sulfhidrilos señuelo que quelan covalentemente los cationes <span class="latex-inline" data-latex="\text{Hg}^{2+}"></span> y <span class="latex-inline" data-latex="\text{Pb}^{2+}"></span>.
+              </p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+              <span class="text-rose-700 font-bold block text-sm">3. Precipitación y Rescate</span>
+              <p class="text-slate-600">
+                Se forma un <strong class="text-slate-900">coágulo insoluble albúmina-metal</strong> en el lumen gástrico, impidiendo la absorción hacia la vena porta. Debe inducirse de inmediato el vaciado gástrico antes de que la pepsina digiera la ovoalbúmina y relibere los iones.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submódulo 5B: Laboratorio de Autoevaluación para Ingreso a Medicina -->
+      <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-clipboard-question text-accent"></i> Laboratorio de Preguntas Tipo Ingreso UCCuyo
+            </h3>
+            <p class="text-xs text-slate-500">Ponga a prueba su razonamiento fisiopatológico y molecular con feedback instantáneo.</p>
+          </div>
+          <span id="quiz-score" class="font-mono text-xs bg-accent-light text-accent border border-accent/20 px-3 py-1 rounded-md font-bold">Puntuación: 0 / 3</span>
+        </div>
+
+        <div id="quiz-container" class="space-y-6">
+          <!-- Pregunta 1 -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3" id="q-block-1">
+            <span class="text-xs font-mono text-accent font-bold uppercase">Pregunta 1 • Bioenergética &amp; Cinética</span>
+            <p class="text-sm text-slate-800 font-medium">
+              Una muestra de amilasa salival se hierve a <span class="latex-inline" data-latex="100^\circ\text{C}"></span> durante 15 minutos. Luego se enfría a <span class="latex-inline" data-latex="37^\circ\text{C}"></span> y se mezcla con almidón a pH 7.0. Se comprueba la ausencia absoluta de maltosa resultante (actividad catalítica = 0%). ¿Cuál es la explicación biofísica certera?
+            </p>
+            <div class="grid grid-cols-1 gap-2 text-xs">
+              <button onclick="checkAnswer(1, 'A')" class="q-opt p-3 text-left rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition shadow-sm">
+                A) Todos los enlaces peptídicos se hidrolizaron en aminoácidos libres monoméricos.
+              </button>
+              <button onclick="checkAnswer(1, 'B')" class="q-opt p-3 text-left rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition shadow-sm">
+                B) La desnaturalización destruyó la conformación tridimensional del sitio activo, aunque la estructura primaria quedó íntegra.
+              </button>
+              <button onclick="checkAnswer(1, 'C')" class="q-opt p-3 text-left rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition shadow-sm">
+                C) Los aminoácidos sufrieron una mutación somática inducida por la agitación térmica.
+              </button>
+            </div>
+            <div id="q-feedback-1" class="hidden p-3 rounded-lg text-xs leading-relaxed"></div>
+          </div>
+
+          <!-- Pregunta 2 -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3" id="q-block-2">
+            <span class="text-xs font-mono text-accent font-bold uppercase">Pregunta 2 • Fisiopatología Ácido-Base</span>
+            <p class="text-sm text-slate-800 font-medium">
+              En una cetoacidosis diabética grave, el pH arterial desciende de <span class="latex-inline" data-latex="7.40"></span> a <span class="latex-inline" data-latex="6.90"></span>. ¿Por qué este desvío en apariencia numérico pequeño resulta fulminante si no se instaura insulinoterapia y bicarbonato?
+            </p>
+            <div class="grid grid-cols-1 gap-2 text-xs">
+              <button onclick="checkAnswer(2, 'A')" class="q-opt p-3 text-left rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition shadow-sm">
+                A) El exceso de protones protona los carboxilatos (<span class="latex-inline" data-latex="-\text{COO}^- \to -\text{COOH}"></span>), destruyendo los puentes salinos que estabilizan la conformación terciaria funcional de enzimas críticas.
+              </button>
+              <button onclick="checkAnswer(2, 'B')" class="q-opt p-3 text-left rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition shadow-sm">
+                B) El pH bajo incrementa la rotación libre en el enlace peptídico transformándolo en enlace triple.
+              </button>
+              <button onclick="checkAnswer(2, 'C')" class="q-opt p-3 text-left rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition shadow-sm">
+                C) Los grupos tiol se convierten en sulfatos inorgánicos solubles.
+              </button>
+            </div>
+            <div id="q-feedback-2" class="hidden p-3 rounded-lg text-xs leading-relaxed"></div>
+          </div>
+
+          <!-- Pregunta 3 -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3" id="q-block-3">
+            <span class="text-xs font-mono text-accent font-bold uppercase">Pregunta 3 • Nutrición Médica y Grupos R</span>
+            <p class="text-sm text-slate-800 font-medium">
+              En una dieta basada exclusivamente en cereales (deficitarios en lisina) o legumbres (deficitarias en metionina), ¿cuál es el principio biológico que exige la "complementación proteica" para la síntesis de nuevas proteínas tisulares humanas?
+            </p>
+            <div class="grid grid-cols-1 gap-2 text-xs">
+              <button onclick="checkAnswer(3, 'A')" class="q-opt p-3 text-left rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition shadow-sm">
+                A) El ribosoma puede saltearse los aminoácidos ausentes y reemplazarlos por moléculas de glucosa.
+              </button>
+              <button onclick="checkAnswer(3, 'B')" class="q-opt p-3 text-left rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition shadow-sm">
+                B) La ley del "todo o nada" en la traducción: si falta un solo aminoácido esencial especificado en el ARNm, la síntesis de la cadena se trunca por completo.
+              </button>
+              <button onclick="checkAnswer(3, 'C')" class="q-opt p-3 text-left rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition shadow-sm">
+                C) Los aminoácidos limitantes son metabolizados exclusivamente como neurotransmisores simpáticos.
+              </button>
+            </div>
+            <div id="q-feedback-3" class="hidden p-3 rounded-lg text-xs leading-relaxed"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    </div>
+  </main>
+
+  <!-- Footer Oficial Vesalio -->
+  <footer class="bg-white border-t border-gray-200 py-4 mt-8 text-center text-xs text-gray-500">
+    Desarrollado por vesalio - Todos los derechos reservados
+  </footer>
+
+  <!-- Modal Tutorial / Guía de Uso Oficial Vesalio -->
+  <div id="tutorial-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <div class="flex items-center gap-2 text-accent font-bold text-lg">
+          <i class="fa-solid fa-book-open"></i>
+          <span>Guía de Uso del Simulador • Bioquímica Médica</span>
+        </div>
+        <button onclick="closeTutorial()" class="text-gray-400 hover:text-gray-600 transition text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs sm:text-sm text-gray-600 leading-relaxed">
+        <p>
+          Bienvenido al <strong>Laboratorio Interactivo de Proteínas y Biofísica Molecular</strong> para el Curso de Ingreso a Medicina (Facultad de Cs. Médicas - UCCuyo). Este entorno modela los cuatro niveles conformacionales, la física cuántica del enlace amida, la patología molecular de la anemia drepanocítica, la desnaturalización y casos clínicos aplicados.
+        </p>
+
+        <div class="space-y-3">
+          <!-- Módulo 1 -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-gray-200 space-y-1.5">
+            <div class="font-bold text-gray-900 text-xs sm:text-sm flex items-center gap-2 text-accent">
+              <i class="fa-solid fa-atom"></i> 1. Fundamentos Bioquímicos y Pilares Funcionales
+            </div>
+            <ul class="list-disc list-inside space-y-1 text-xs text-gray-700 ml-1">
+              <li><strong>Etimología de Berzelius:</strong> Conoce el origen del vocablo <em>proteios</em> ("lo primero / lo principal") propuesto a Mulder y su ponderación cuantitativa ($> 50\%$ del peso seco celular).</li>
+              <li><strong>Los Cinco Pilares Fisiopatológicos:</strong> Explora interactivamente la catálisis ultraeficiente (aceleraciones cinéticas de hasta $10^{12}$ y $\Delta G^\ddagger$), defensa inmune con paratótopos en IgG, transporte alostérico de gases (efecto Bohr en hemoglobina), sostén conectivo con colágeno y motilidad con actina-miosina, y endocrinología peptídica (insulina y receptores).</li>
+            </ul>
+          </div>
+
+          <!-- Módulo 2 -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-gray-200 space-y-1.5">
+            <div class="font-bold text-gray-900 text-xs sm:text-sm flex items-center gap-2 text-accent">
+              <i class="fa-solid fa-cubes-stacked"></i> 2. Enlace Peptídico, Niveles Estructurales 3D y Drepanocitosis
+            </div>
+            <ul class="list-disc list-inside space-y-1 text-xs text-gray-700 ml-1">
+              <li><strong>Química y Resonancia del Enlace Peptídico:</strong> Observa la síntesis por condensación ($-\text{COOH} + -\text{NH}_2 \to -\text{CO}-\text{NH}- + \text{H}_2\text{O}$) y la deslocalización $\pi$ que le confiere un $40\%$ de carácter de doble enlace parcial ($1.33\,\text{Å}$), rigidez planar y rotación exclusiva en los ángulos diedros $\phi$ y $\psi$.</li>
+              <li><strong>Visor 3D Interactivo de los 4 Niveles:</strong> Alterna y rota espacialmente con el cursor o touch la <em>Estructura Primaria</em> (collar covalente), <em>Secundaria</em> (hélice $\alpha$ con puentes de H longitudinales sin grupos R), <em>Terciaria</em> (empaquetamiento globular con puentes disulfuro y núcleo apolar) y <em>Cuaternaria</em> (tetrámero $\alpha_2\beta_2$ de la Hemoglobina con anillos hemo y $\text{Fe}^{2+}$).</li>
+              <li><strong>Simulador Hemorreológico de Anemia Falciforme:</strong> Contrasta la hemoglobina normal $\text{HbA}$ ($\text{Glu6}$ polar aniónico) contra la variante mutada $\text{HbS}$ ($\text{Val6}$ hidrofóbico por mutación transversión $\text{GAG} \to \text{GTG}$). Activa la desoxigenación capilar para presenciar la exposición del parche hidrofóbico, polimerización en fibras insolubles, deformación en hoz del eritrocito y la <em>crisis vasooclusiva microvascular</em> con isquemia.</li>
+            </ul>
+          </div>
+
+          <!-- Módulo 3 -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-gray-200 space-y-1.5">
+            <div class="font-bold text-gray-900 text-xs sm:text-sm flex items-center gap-2 text-accent">
+              <i class="fa-solid fa-table-cells"></i> 3. Clasificación Tridimensional y Composición Química
+            </div>
+            <ul class="list-disc list-inside space-y-1 text-xs text-gray-700 ml-1">
+              <li><strong>Criterio Conformacional:</strong> Compara las proteínas <em>Fibrosas</em> (escleroproteínas insolubles, relación axial $> 10$, soporte estático: colágeno, elastina, $\alpha$-queratina) frente a las <em>Globulares</em> (esferoproteínas solubles, relación axial $< 4$, funciones dinámicas: enzimas, albúmina, inmunoglobulinas).</li>
+              <li><strong>Criterio Químico:</strong> Diferencia <em>Holoproteínas</em> (100% aminoacídicas) de <em>Heteroproteínas conjugadas</em> que poseen apoproteína unida a grupos prostéticos esenciales (glucoproteínas, lipoproteínas, hemoproteínas y metaloproteínas).</li>
+            </ul>
+          </div>
+
+          <!-- Módulo 4 -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-gray-200 space-y-1.5">
+            <div class="font-bold text-gray-900 text-xs sm:text-sm flex items-center gap-2 text-accent">
+              <i class="fa-solid fa-fire-flame-curved"></i> 4. Desnaturalización y Agentes Fisicoquímicos
+            </div>
+            <ul class="list-disc list-inside space-y-1 text-xs text-gray-700 ml-1">
+              <li><strong>Simulador Dinámico de Desplegamiento:</strong> Mueve el control deslizante de energía térmica/estrés para observar el colapso conformacional 3D, la pérdida de puentes de H y la exteriorización de parches hidrofóbicos que inducen agregación coloidal y precipitación.</li>
+              <li><strong>Integridad de la Estructura Primaria:</strong> Refuerza el principio de examen: los agentes desnaturalizantes ordinarios y la fiebre jamás rompen enlaces peptídicos covalentes.</li>
+              <li><strong>Matriz de Agentes Médicos:</strong> Revisa el mecanismo de acción de calor/UV, pH extremo (anulación de puentes salinos), solventes orgánicos y metales pesados divalentes ($\text{Hg}^{2+}, \text{Pb}^{2+}$).</li>
+            </ul>
+          </div>
+
+          <!-- Módulo 5 -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-gray-200 space-y-1.5">
+            <div class="font-bold text-gray-900 text-xs sm:text-sm flex items-center gap-2 text-accent">
+              <i class="fa-solid fa-user-doctor"></i> 5. Casos Clínicos Aplicados y Autoevaluación Médica
+            </div>
+            <ul class="list-disc list-inside space-y-1 text-xs text-gray-700 ml-1">
+              <li><strong>Dilema de Antisepsia (Alcohol 70% vs. 100%):</strong> Simula sobre el lienzo bacteriano la coagulación periférica paradójica del etanol 100% (costra que protege el interior) en contraste con la difusión citoplasmática letal y biocida del alcohol 70% hidratado.</li>
+              <li><strong>Toxicología de Urgencia (Ovoalbúmina de Sacrificio):</strong> Analiza cómo la clara de huevo actúa como quelante señuelo rico en sulfhidrilos libres ante la ingestión aguda de sales de mercurio o plomo.</li>
+              <li><strong>Laboratorio de Preguntas Tipo Ingreso UCCuyo:</strong> Responde casos clínicos de cinetica enzimática tras ebullición, cetoacidosis diabética y complementación dietética con feedback instantáneo y contador de puntuación.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-amber-50 rounded-xl border border-amber-200 text-amber-800 space-y-1.5">
+          <h4 class="font-bold flex items-center gap-1.5 text-xs sm:text-sm">
+            <i class="fa-solid fa-lightbulb"></i>
+            Recomendaciones para el Examen de Ingreso UCCuyo
+          </h4>
+          <p class="text-xs leading-relaxed">
+            Recuerda que la conformación nativa es termodinámicamente la de mínima energía libre, que la mutación drepanocítica sustituye un aminoácido polar ($\text{Glu}$) por uno apolar ($\text{Val}$) en posición 6 de la cadena $\beta$, y que la desnaturalización conserva intacta la secuencia primaria lineal.
+          </p>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-gray-100 flex justify-end">
+        <button onclick="closeTutorial()" class="px-5 py-2.5 bg-accent text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-accent-hover transition shadow-sm">
+          Entendido, comenzar exploración
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- SCRIPT INTEGRADO: LÓGICA INTERACTIVA, 3D (THREE.JS) Y CANVASES EDUCATIVOS -->
+  <!-- ========================================================================= -->
+  <script>
+    // --- ESTADO GLOBAL ---
+    let currentModule = 1;
+    let selectedLevel = 1;
+    let sickleState = { isDeoxygenated: false, mode: 'HbA' };
+    let quizScore = 0;
+    const answeredQuestions = {};
+
+    // --- DATOS DE LOS CINCO PILARES (MÓDULO 1) ---
+    const pillarsData = [
+      {
+        title: "Pilar 1: Catálisis Biológica Ultraeficiente",
+        icon: "fa-bolt",
+        color: "text-amber-400",
+        badge: "Aceleración de Cinética Química",
+        formula: "v_{\\text{enz}} \\approx 10^{6} - 10^{12} \\times v_{\\text{no catalizada}}",
+        description: "Sin enzimas proteicas, las reacciones termodinámicamente espontáneas del organismo requerirían siglos para llevarse a cabo. Las enzimas estabilizan el estado de transición y reducen drásticamente la energía de activación (\\Delta G^{\\ddagger}).",
+        clinical: "Ejemplo médico: La Anhidrasa Carbónica eritrocitaria hidrata 600.000 moléculas de CO₂ por segundo en el capilar tisular, permitiendo el intercambio gaseoso alveolar sincrónico con el ciclo cardíaco."
+      },
+      {
+        title: "Pilar 2: Defensa Inmunológica y Reconocimiento Específico",
+        icon: "fa-shield-virus",
+        color: "text-emerald-400",
+        badge: "Parátopos & Epítopos",
+        formula: "\\text{Inmunoglobulina G (IgG)}: \\text{2 Cadenas Pesadas (H)} + \\text{2 Ligeras (L)}",
+        description: "Los anticuerpos son glucoproteínas globulares con regiones hipervariables (CDR) en el extremo amino-terminal que forman el paratótopo. Su conformación espacial se adapta estereoquímicamente al epítopo bacteriano o viral mediante enlaces no covalentes múltiples.",
+        clinical: "Ejemplo médico: En las gammapatías monoclonales (como el Mieloma Múltiple), la proliferación clonal produce un exceso deletéreo de una única paraproteína con lesión ósea e insuficiencia renal."
+      },
+      {
+        title: "Pilar 3: Transporte Específico de Moléculas y Gases",
+        icon: "fa-truck-droplet",
+        color: "text-red-400",
+        badge: "Alosterismo & Efecto Bohr",
+        formula: "\\text{Hb} + 4\\,\\text{O}_2 \\rightleftharpoons \\text{Hb}(\\text{O}_2)_4 \\quad [\\text{Transición } \\text{T (Tensa)} \\to \\text{R (Relajada)}]",
+        description: "La Hemoglobina eritrocitaria (tetrámero 2\\alpha 2\\beta) une coordinadamente cuatro moléculas de O₂ gracias al catión Fe²⁺ en el centro del anillo de protoporfirina IX. Presenta cooperatividad homotrópica alostérica.",
+        clinical: "Efecto Bohr: En los tejidos con acidosis respiratoria o láctica (menor pH y mayor pCO₂), los residuos de histidina se protonan, estabilizando el estado T de baja afinidad y descargando el oxígeno donde el tejido más lo requiere."
+      },
+      {
+        title: "Pilar 4: Sostén Estructural y Motilidad Macroscópica",
+        icon: "fa-bone",
+        color: "text-blue-400",
+        badge: "Matriz Extracelular & Contracción",
+        formula: "\\text{Fuerza Fisiológica}: \\text{Miosina II} + \\text{Microfilamentos de Actina} + \\text{ATP}",
+        description: "El colágeno representa el 25% de la masa proteica total del cuerpo, confiriendo tensión elástica a huesos, córnea, vasos y piel. Por otro lado, la interacción cíclica actina-miosina genera desplazamiento mecánico y contracción muscular sincrónica.",
+        clinical: "Ejemplo médico: El escorbuto por hipovitaminosis C inhibe a la prolil-hidroxilasa; sin hidroxiprolina se pierden los puentes de H intercatenarios de la triple hélice del colágeno, produciendo fragilidad capilar y hemorragias gingivales."
+      },
+      {
+        title: "Pilar 5: Regulación y Señalización Endocrina Sistémica",
+        icon: "fa-envelope-open-text",
+        color: "text-purple-400",
+        badge: "Hormonas Polipeptídicas",
+        formula: "\\text{Insulina}: 51\\,\\text{aminoácidos en 2 cadenas (A de 21 y B de 30)} + 3\\,\\text{puentes disulfuro}",
+        description: "Hormonas como la insulina, glucagón, ACTH y GH actúan a concentraciones picomolares (10⁻¹² M) fijándose a receptores transmembrana específicos e iniciando cascadas de fosforilación intracelular.",
+        clinical: "Ejemplo médico: En la Diabetes Mellitus Tipo 1, la destrucción autoinmune de las células \\beta de los islotes pancreáticos anula la producción de insulina, bloqueando la traslocación de transportadores GLUT4 al sarcolema."
+      }
+    ];
+
+    // --- DATOS DE LOS CUATRO NIVELES ESTRUCTURALES (MÓDULO 2) ---
+    const levelsData = {
+      1: {
+        title: "Estructura Primaria: La Secuencia Lineal Codificada",
+        subtitle: "El código determinante del plegamiento espontáneo",
+        description: "Es el orden lineal de aminoácidos unidos por enlaces peptídicos covalentes desde el extremo amino-terminal (N-terminal) hasta el carboxilo-terminal (C-terminal). Esta secuencia está codificada directamente en el ADN nuclear según el código genético universal.",
+        bonds: "Únicamente Enlaces Covalentes Peptídicos (-CO-NH-). No intervienen puentes de hidrógeno ni atracciones hidrofóbicas.",
+        clinical: "Hipótesis de Anfinsen: Toda la información tridimensional requerida para el plegamiento nativo yace intrínsecamente escrita en la secuencia primaria. Una simple alteración (como Glu por Val) puede desencadenar letalidad molecular (ej. Drepanocitosis)."
+      },
+      2: {
+        title: "Estructura Secundaria: Plegamientos Locales Periódicos",
+        subtitle: "Hélice Alfa y Lámina Plegada Beta",
+        description: "Conformación espacial periódica local que adopta el esqueleto polipeptídico. Sostenida exclusivamente por puentes de hidrógeno entre el oxígeno del grupo carbonilo (>C=O) de un enlace peptídico y el hidrógeno del grupo amino (-N-H) de otro enlace peptídico del mismo esqueleto.",
+        bonds: "Puentes de Hidrógeno intramoleculares e intermoleculares del esqueleto amídico. ¡Los grupos R de los aminoácidos NO participan!",
+        clinical: "Hélice Alfa: Giro helicoidal dextrógiro con 3.6 residuos por vuelta. Lámina Beta: Hojas en fuelle paralelas o antiparalelas. La fibroína de la seda y la queratina son ricas en estos motivos."
+      },
+      3: {
+        title: "Estructura Terciaria: Conformación 3D Nativa Completa",
+        subtitle: "Arquitectura espacial de una cadena polipeptídica completa",
+        description: "Empaquetamiento globular global tridimensional impulsado fundamentalmente por el efecto hidrofóbico en medio acuoso: los residuos apolares se ocultan en el núcleo interno y los polares se exponen en superficie.",
+        bonds: "1) Efecto hidrofóbico y Van der Waals. 2) Puentes de hidrógeno entre cadenas laterales. 3) Puentes salinos electrostáticos (-COO⁻ y -NH₃⁺). 4) Puentes Disulfuro covalentes (-S-S- entre dos Cisteínas).",
+        clinical: "La conformación terciaria crea cavidades microscópicas únicas como los sitios activos de las enzimas o los bolsillos de unión a ligandos hidrofóbicos."
+      },
+      4: {
+        title: "Estructura Cuaternaria: Ensamblaje Multimérico",
+        subtitle: "Oligómeros, cooperatividad alostérica y subunidades",
+        description: "Organización espacial de dos o más cadenas polipeptídicas separadas (llamadas subunidades, monómeros o protómeros) para constituir un complejo proteico funcional único.",
+        bonds: "Fuerzas débiles no covalentes mayoritariamente (hidrofóbicas, puentes de H, electrostáticas) y ocasionales puentes disulfuro intercatenarios.",
+        clinical: "Tetrámero de la Hemoglobina (2α y 2β): Permite la regulación alostérica y cooperatividad homotrópica. Las proteínas monoméricas como la Mioglobina carecen de estructura cuaternaria."
+      }
+    };
+
+    // --- MODAL TUTORIAL / GUÍA DE USO ---
+    function openTutorial() {
+      const modal = document.getElementById('tutorial-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeTutorial() {
+      const modal = document.getElementById('tutorial-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    // Compatibilidad
+    function openGuideModal() { openTutorial(); }
+    function closeGuideModal() { closeTutorial(); }
+
+    // --- FUNCIÓN DE CAMBIO DE MÓDULO ---
+    function switchModule(modIndex) {
+      currentModule = modIndex;
+      document.querySelectorAll('.module-section').forEach(sec => sec.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('tab-active');
+        btn.classList.add('text-slate-400');
+      });
+
+      const activeSec = document.getElementById(`module-${modIndex}`);
+      const activeBtn = document.getElementById(`tab-btn-${modIndex}`);
+      if (activeSec) activeSec.classList.remove('hidden');
+      if (activeBtn) {
+        activeBtn.classList.add('tab-active');
+        activeBtn.classList.remove('text-slate-400');
+      }
+
+      // Inicializaciones específicas al abrir módulos
+      if (modIndex === 2) {
+        setTimeout(() => {
+          initThreeVisualization();
+          setLevel(selectedLevel);
+          initCapillaryCanvas();
+        }, 50);
+      } else if (modIndex === 4) {
+        setTimeout(() => {
+          initDenatureCanvas();
+        }, 50);
+      } else if (modIndex === 5) {
+        setTimeout(() => {
+          initBacterialCanvas();
+        }, 50);
+      }
+
+      // Re-renderizar KaTeX tras mostrar elementos
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    // --- PILARES FUNCIONALES (MÓDULO 1) ---
+    function selectPillar(idx) {
+      document.querySelectorAll('.pillar-btn').forEach((btn, i) => {
+        if (i === idx) {
+          btn.className = "pillar-btn p-3 rounded-xl bg-accent-light border-2 border-accent text-accent flex flex-col items-center text-center gap-2 transition shadow-sm font-semibold";
+        } else {
+          btn.className = "pillar-btn p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 flex flex-col items-center text-center gap-2 transition hover:bg-slate-100 font-medium";
+        }
+      });
+
+      const p = pillarsData[idx];
+      const box = document.getElementById('pillar-content');
+      box.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+            <div class="flex items-center gap-3">
+              <i class="fa-solid ${p.icon} text-accent text-2xl"></i>
+              <h4 class="text-lg font-bold text-slate-900">${p.title}</h4>
+            </div>
+            <span class="text-xs font-mono bg-accent-light text-accent px-2.5 py-1 rounded border border-accent/20 font-bold">${p.badge}</span>
+          </div>
+          <div class="p-3 bg-white rounded-xl border border-slate-200 font-mono text-center text-slate-800 text-sm shadow-sm">
+            $${p.formula}$
+          </div>
+          <p class="text-slate-700 text-sm leading-relaxed">${p.description}</p>
+          <div class="p-3.5 bg-blue-50 border-l-4 border-accentCyan rounded-r-xl text-xs space-y-1">
+            <span class="font-bold text-blue-900 uppercase tracking-wide">Correlato Médico UCCuyo:</span>
+            <p class="text-slate-700">${p.clinical}</p>
+          </div>
+        </div>
+      `;
+
+      if (window.renderMathInElement) {
+        renderMathInElement(box, {
+          delimiters: [
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    // --- NIVELES ESTRUCTURALES (MÓDULO 2) ---
+    function setLevel(lvl) {
+      selectedLevel = lvl;
+      document.querySelectorAll('.lvl-btn').forEach((btn, i) => {
+        if (i + 1 === lvl) {
+          btn.className = "lvl-btn bg-accent text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-sm";
+        } else {
+          btn.className = "lvl-btn text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-lg text-xs font-semibold transition";
+        }
+      });
+
+      const data = levelsData[lvl];
+      const detailBox = document.getElementById('level-detail-box');
+      detailBox.innerHTML = `
+        <div class="space-y-3">
+          <div class="border-b border-slate-200 pb-2">
+            <span class="text-[11px] font-mono text-accent uppercase tracking-wider font-bold">${data.subtitle}</span>
+            <h4 class="text-lg font-bold text-slate-900">${data.title}</h4>
+          </div>
+          <p class="text-slate-700 text-xs sm:text-sm leading-relaxed">${data.description}</p>
+          <div class="p-3 bg-white rounded-xl border border-slate-200 text-xs space-y-1 shadow-sm">
+            <span class="font-bold text-slate-800 block">Fuerzas Estabilizadoras:</span>
+            <span class="text-slate-600">${data.bonds}</span>
+          </div>
+        </div>
+        <div class="p-3 bg-amber-50 border-l-4 border-amber-500 rounded-r-xl text-xs space-y-1">
+          <span class="font-bold text-amber-900">Significado Fisiopatológico:</span>
+          <p class="text-slate-700">${data.clinical}</p>
+        </div>
+      `;
+
+      document.getElementById('canvas-tag').innerText = `Visualización 3D: Estructura ${lvl}° (${data.subtitle})`;
+      updateThreeSceneForLevel(lvl);
+
+      if (window.renderMathInElement) {
+        renderMathInElement(detailBox, {
+          delimiters: [{left: '$', right: '$', display: false}],
+          throwOnError: false
+        });
+      }
+    }
+
+    // --- VISUALIZACIÓN THREE.JS PARA LOS 4 NIVELES ---
+    let scene, camera, renderer, proteinGroup;
+    let isMouseDown = false, mouseX = 0, mouseY = 0;
+
+    function initThreeVisualization() {
+      const container = document.getElementById('three-container');
+      if (!container || renderer) return; // Ya inicializado
+
+      const w = container.clientWidth || 400;
+      const h = container.clientHeight || 400;
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x050a14);
+
+      camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
+      camera.position.set(0, 0, 30);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(w, h);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      // Luces
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+      scene.add(ambientLight);
+
+      const dirLight1 = new THREE.DirectionalLight(0x008dda, 1.2);
+      dirLight1.position.set(20, 30, 20);
+      scene.add(dirLight1);
+
+      const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.6);
+      dirLight2.position.set(-20, -20, -20);
+      scene.add(dirLight2);
+
+      proteinGroup = new THREE.Group();
+      scene.add(proteinGroup);
+
+      // Controles táctiles y mouse para rotación
+      container.addEventListener('mousedown', (e) => {
+        isMouseDown = true;
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+      window.addEventListener('mouseup', () => { isMouseDown = false; });
+      container.addEventListener('mousemove', (e) => {
+        if (!isMouseDown) return;
+        const dx = e.clientX - mouseX;
+        const dy = e.clientY - mouseY;
+        proteinGroup.rotation.y += dx * 0.01;
+        proteinGroup.rotation.x += dy * 0.01;
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+
+      // Touch events para móviles
+      container.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          isMouseDown = true;
+          mouseX = e.touches[0].clientX;
+          mouseY = e.touches[0].clientY;
+        }
+      });
+      window.addEventListener('touchend', () => { isMouseDown = false; });
+      container.addEventListener('touchmove', (e) => {
+        if (!isMouseDown || e.touches.length !== 1) return;
+        const dx = e.touches[0].clientX - mouseX;
+        const dy = e.touches[0].clientY - mouseY;
+        proteinGroup.rotation.y += dx * 0.01;
+        proteinGroup.rotation.x += dy * 0.01;
+        mouseX = e.touches[0].clientX;
+        mouseY = e.touches[0].clientY;
+      });
+
+      // Zoom con rueda
+      container.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        camera.position.z += e.deltaY * 0.02;
+        camera.position.z = Math.max(12, Math.min(60, camera.position.z));
+      });
+
+      // Redimensión responsiva
+      window.addEventListener('resize', () => {
+        if (!container || !renderer) return;
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+      });
+
+      function animate() {
+        requestAnimationFrame(animate);
+        if (!isMouseDown) {
+          proteinGroup.rotation.y += 0.004;
+        }
+        renderer.render(scene, camera);
+      }
+      animate();
+    }
+
+    function resetCamera3D() {
+      if (!camera || !proteinGroup) return;
+      camera.position.set(0, 0, 30);
+      proteinGroup.rotation.set(0, 0, 0);
+    }
+
+    function updateThreeSceneForLevel(lvl) {
+      if (!proteinGroup) return;
+      // Limpiar grupo anterior
+      while (proteinGroup.children.length > 0) {
+        const obj = proteinGroup.children[0];
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
+          else obj.material.dispose();
+        }
+        proteinGroup.remove(obj);
+      }
+
+      const sphereGeo = new THREE.SphereGeometry(0.7, 16, 16);
+
+      if (lvl === 1) {
+        // Estructura Primaria: Cadena extendida tipo collar de perlas de aminoácidos
+        const numResidues = 22;
+        const points = [];
+        for (let i = 0; i < numResidues; i++) {
+          const x = (i - numResidues / 2) * 1.3;
+          const y = Math.sin(i * 0.8) * 1.5;
+          const z = Math.cos(i * 0.6) * 1.0;
+          points.push(new THREE.Vector3(x, y, z));
+
+          const col = (i % 3 === 0) ? 0x008dda : (i % 3 === 1) ? 0x10b981 : 0xd97706;
+          const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.3, metalness: 0.2 });
+          const sphere = new THREE.Mesh(sphereGeo, mat);
+          sphere.position.set(x, y, z);
+          proteinGroup.add(sphere);
+        }
+        const curve = new THREE.CatmullRomCurve3(points);
+        const tubeGeo = new THREE.TubeGeometry(curve, 64, 0.2, 8, false);
+        const tubeMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.5 });
+        const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
+        proteinGroup.add(tubeMesh);
+
+      } else if (lvl === 2) {
+        // Estructura Secundaria: Hélice alfa con enlaces H longitudinales
+        const turns = 5;
+        const pointsPerTurn = 16;
+        const totalPoints = turns * pointsPerTurn;
+        const radius = 3.2;
+        const height = 18;
+        const curvePoints = [];
+
+        for (let i = 0; i <= totalPoints; i++) {
+          const theta = (i / pointsPerTurn) * Math.PI * 2;
+          const y = ((i / totalPoints) - 0.5) * height;
+          const x = Math.cos(theta) * radius;
+          const z = Math.sin(theta) * radius;
+          curvePoints.push(new THREE.Vector3(x, y, z));
+
+          if (i % 3 === 0) {
+            const mat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.3 });
+            const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.4, 12, 12), mat);
+            sphere.position.set(x, y, z);
+            proteinGroup.add(sphere);
+          }
+        }
+        const alphaCurve = new THREE.CatmullRomCurve3(curvePoints);
+        const ribbonGeo = new THREE.TubeGeometry(alphaCurve, 128, 0.45, 8, false);
+        const ribbonMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.2, metalness: 0.3 });
+        proteinGroup.add(new THREE.Mesh(ribbonGeo, ribbonMat));
+
+        // Líneas punteadas simulando puentes de H longitudinales
+        const lineMat = new THREE.LineDashedMaterial({ color: 0xfacc15, dashSize: 0.4, gapSize: 0.2 });
+        for (let j = 0; j < totalPoints - pointsPerTurn; j += 4) {
+          const p1 = curvePoints[j];
+          const p2 = curvePoints[j + Math.floor(pointsPerTurn * 0.9)];
+          const lineGeo = new THREE.BufferGeometry().setFromPoints([p1, p2]);
+          const line = new THREE.Line(lineGeo, lineMat);
+          line.computeLineDistances();
+          proteinGroup.add(line);
+        }
+
+      } else if (lvl === 3) {
+        // Estructura Terciaria: Globular con núcleo y bucles plegados
+        const randomPoints = [
+          new THREE.Vector3(-4, -5, 0),
+          new THREE.Vector3(-2, -3, 4),
+          new THREE.Vector3(2, -4, 2),
+          new THREE.Vector3(5, -1, 3),
+          new THREE.Vector3(4, 3, -1),
+          new THREE.Vector3(1, 5, -3),
+          new THREE.Vector3(-3, 4, -2),
+          new THREE.Vector3(-5, 1, 1),
+          new THREE.Vector3(-1, 0, 3),
+          new THREE.Vector3(3, 1, -2),
+          new THREE.Vector3(0, -2, -4),
+          new THREE.Vector3(-4, -5, 0)
+        ];
+        const tertCurve = new THREE.CatmullRomCurve3(randomPoints, true);
+        const tertTube = new THREE.TubeGeometry(tertCurve, 120, 0.8, 12, true);
+        const tertMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4, roughness: 0.2, metalness: 0.1 });
+        proteinGroup.add(new THREE.Mesh(tertTube, tertMat));
+
+        // Esferas simulando puentes disulfuro y grupos polares
+        const ssMat = new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0x7f1d1d });
+        const s1 = new THREE.Mesh(new THREE.SphereGeometry(0.8, 16, 16), ssMat);
+        const s2 = new THREE.Mesh(new THREE.SphereGeometry(0.8, 16, 16), ssMat);
+        s1.position.set(-2, -3, 4);
+        s2.position.set(2, -4, 2);
+        proteinGroup.add(s1);
+        proteinGroup.add(s2);
+
+      } else if (lvl === 4) {
+        // Estructura Cuaternaria: Tetrámero tipo Hemoglobina (2 Alfa azul, 2 Beta rojo)
+        const subconfigs = [
+          { x: -3.5, y: 3.0, z: 0, col: 0x0284c7 }, // Alfa 1
+          { x: 3.5, y: 3.0, z: 0, col: 0x38bdf8 },  // Alfa 2
+          { x: -3.5, y: -3.0, z: 0, col: 0xdc2626 }, // Beta 1
+          { x: 3.5, y: -3.0, z: 0, col: 0xf87171 }   // Beta 2
+        ];
+
+        subconfigs.forEach((cfg) => {
+          const subPts = [
+            new THREE.Vector3(cfg.x - 1.5, cfg.y - 1.5, cfg.z),
+            new THREE.Vector3(cfg.x, cfg.y + 1.8, cfg.z + 1.5),
+            new THREE.Vector3(cfg.x + 1.8, cfg.y - 0.5, cfg.z - 1.2),
+            new THREE.Vector3(cfg.x - 1.5, cfg.y - 1.5, cfg.z)
+          ];
+          const subCurve = new THREE.CatmullRomCurve3(subPts, true);
+          const subGeo = new THREE.TubeGeometry(subCurve, 60, 0.7, 10, true);
+          const subMat = new THREE.MeshStandardMaterial({ color: cfg.col, roughness: 0.3 });
+          proteinGroup.add(new THREE.Mesh(subGeo, subMat));
+
+          // Grupo Hemo con catión central ferroso Fe2+
+          const hemeGeo = new THREE.CylinderGeometry(0.9, 0.9, 0.2, 8);
+          const hemeMat = new THREE.MeshStandardMaterial({ color: 0x78350f, metalness: 0.8 });
+          const heme = new THREE.Mesh(hemeGeo, hemeMat);
+          heme.position.set(cfg.x, cfg.y, cfg.z);
+          heme.rotation.x = Math.PI / 4;
+          proteinGroup.add(heme);
+
+          const feGeo = new THREE.SphereGeometry(0.35, 12, 12);
+          const feMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xb45309 });
+          const fe = new THREE.Mesh(feGeo, feMat);
+          fe.position.set(cfg.x, cfg.y, cfg.z + 0.15);
+          proteinGroup.add(fe);
+        });
+      }
+    }
+
+    // --- SIMULADOR DE CAPILAR Y ANEMIA FALCIFORME ---
+    let capillaryCanvas, capCtx, animationFrameId;
+    let redBloodCells = [];
+
+    function initCapillaryCanvas() {
+      capillaryCanvas = document.getElementById('capillaryCanvas');
+      if (!capillaryCanvas) return;
+      capCtx = capillaryCanvas.getContext('2d');
+
+      capillaryCanvas.width = capillaryCanvas.parentElement.clientWidth;
+      capillaryCanvas.height = 192;
+
+      // Generar glóbulos rojos iniciales
+      redBloodCells = [];
+      for (let i = 0; i < 12; i++) {
+        redBloodCells.push({
+          x: Math.random() * capillaryCanvas.width,
+          y: 40 + Math.random() * (capillaryCanvas.height - 80),
+          vx: 1.2 + Math.random() * 0.8,
+          radius: 14,
+          isStuck: false
+        });
+      }
+
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      renderCapillaryLoop();
+    }
+
+    function toggleOxygenation() {
+      sickleState.isDeoxygenated = !sickleState.isDeoxygenated;
+      const btn = document.getElementById('btn-oxy');
+      const label = document.getElementById('oxy-label');
+      if (sickleState.isDeoxygenated) {
+        btn.className = "px-3 py-1.5 rounded-lg bg-red-700 text-white font-semibold text-xs flex items-center gap-2 hover:bg-red-600 transition";
+        label.innerText = "Estado Desoxigenado (Tejido Periférico / pO₂ Baja)";
+      } else {
+        btn.className = "px-3 py-1.5 rounded-lg bg-cyan-600 text-white font-semibold text-xs flex items-center gap-2 hover:bg-cyan-500 transition";
+        label.innerText = "Estado Oxigenado (Alvéolos / pO₂ Alta)";
+      }
+    }
+
+    function setSickleMode(mode) {
+      sickleState.mode = mode;
+      const bA = document.getElementById('btn-mode-hba');
+      const bS = document.getElementById('btn-mode-hbs');
+      if (mode === 'HbA') {
+        bA.className = "px-2.5 py-1 rounded bg-slate-800 text-cyan-400 border border-cyan-500 font-semibold";
+        bS.className = "px-2.5 py-1 rounded bg-slate-900 text-slate-400 border border-slate-800 font-semibold";
+      } else {
+        bS.className = "px-2.5 py-1 rounded bg-red-950 text-red-400 border border-red-500 font-semibold";
+        bA.className = "px-2.5 py-1 rounded bg-slate-900 text-slate-400 border border-slate-800 font-semibold";
+      }
+    }
+
+    function renderCapillaryLoop() {
+      if (!capCtx || !capillaryCanvas) return;
+      capCtx.clearRect(0, 0, capillaryCanvas.width, capillaryCanvas.height);
+
+      const w = capillaryCanvas.width;
+      const h = capillaryCanvas.height;
+
+      // Pared capilar (Endotelio vascular con zona estrecha central)
+      capCtx.fillStyle = '#1e293b';
+      capCtx.fillRect(0, 0, w, 24);
+      capCtx.fillRect(0, h - 24, w, 24);
+
+      // Células endoteliales
+      capCtx.fillStyle = '#334155';
+      for (let x = 0; x < w; x += 60) {
+        capCtx.beginPath();
+        capCtx.ellipse(x + 30, 20, 25, 6, 0, 0, Math.PI * 2);
+        capCtx.fill();
+        capCtx.beginPath();
+        capCtx.ellipse(x + 30, h - 20, 25, 6, 0, 0, Math.PI * 2);
+        capCtx.fill();
+      }
+
+      // Estrechamiento capilar en el medio (x = w*0.55)
+      const chokeX = w * 0.55;
+      const chokeWidth = 70;
+
+      const isSicklingActive = (sickleState.mode === 'HbS' && sickleState.isDeoxygenated);
+      const statusTag = document.getElementById('sickle-status');
+
+      if (isSicklingActive) {
+        statusTag.innerText = "¡CRISIS VASOOCLUSIVA! HbS Polimerizada (Isquemia)";
+        statusTag.className = "px-2 py-0.5 rounded bg-red-950 text-red-300 border border-red-800 font-mono animate-pulse";
+      } else {
+        statusTag.innerText = "Flujo Microvascular Normal y Deformabilidad Conservada";
+        statusTag.className = "px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 font-mono";
+      }
+
+      // Actualizar y dibujar glóbulos rojos
+      redBloodCells.forEach((rbc, index) => {
+        if (!rbc.isStuck) {
+          rbc.x += isSicklingActive ? rbc.vx * 0.35 : rbc.vx;
+        }
+
+        // Si es HbS desoxigenada y llega a la zona estrecha, se traba
+        if (isSicklingActive && Math.abs(rbc.x - chokeX) < chokeWidth && index < 6) {
+          rbc.isStuck = true;
+        } else if (!isSicklingActive) {
+          rbc.isStuck = false;
+        }
+
+        if (rbc.x > w + 20) {
+          rbc.x = -20;
+          rbc.y = 35 + Math.random() * (h - 70);
+          rbc.isStuck = false;
+        }
+
+        capCtx.save();
+        capCtx.translate(rbc.x, rbc.y);
+
+        if (isSicklingActive) {
+          // Glóbulo rojo en forma falciforme (Media luna rígida)
+          capCtx.fillStyle = '#dc2626';
+          capCtx.beginPath();
+          capCtx.arc(0, 0, 16, Math.PI * 0.15, Math.PI * 1.35, false);
+          capCtx.quadraticCurveTo(0, 2, 12, 6);
+          capCtx.closePath();
+          capCtx.fill();
+          capCtx.strokeStyle = '#991b1b';
+          capCtx.lineWidth = 1.5;
+          capCtx.stroke();
+        } else {
+          // Glóbulo rojo bicóncavo normal (elástico, se estira al pasar por capilar)
+          capCtx.fillStyle = '#ef4444';
+          capCtx.beginPath();
+          const elongation = (Math.abs(rbc.x - chokeX) < chokeWidth) ? 1.6 : 1.1;
+          capCtx.ellipse(0, 0, 13 * elongation, 9 / (elongation * 0.8), 0, 0, Math.PI * 2);
+          capCtx.fill();
+          // Concavidad central
+          capCtx.fillStyle = '#b91c1c';
+          capCtx.beginPath();
+          capCtx.ellipse(0, 0, 5, 3.5, 0, 0, Math.PI * 2);
+          capCtx.fill();
+        }
+
+        capCtx.restore();
+      });
+
+      animationFrameId = requestAnimationFrame(renderCapillaryLoop);
+    }
+
+    // --- SIMULADOR DE DESNATURALIZACIÓN (MÓDULO 4) ---
+    let denatureCanvas, denCtx;
+    let denatureValue = 0;
+
+    function initDenatureCanvas() {
+      denatureCanvas = document.getElementById('denatureCanvas');
+      if (!denatureCanvas) return;
+      denCtx = denatureCanvas.getContext('2d');
+      denatureCanvas.width = denatureCanvas.parentElement.clientWidth;
+      denatureCanvas.height = 256;
+      drawDenatureVisual(0);
+    }
+
+    function updateDenaturation(val) {
+      denatureValue = parseInt(val);
+      const tag = document.getElementById('denature-tag');
+      if (denatureValue < 25) {
+        tag.innerText = "Estado: Plegamiento Nativo Funcional";
+        tag.className = "text-xs font-semibold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800";
+      } else if (denatureValue < 70) {
+        tag.innerText = "Estado: Pérdida de Estructura Terciaria y Puentes Salinos";
+        tag.className = "text-xs font-semibold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800";
+      } else {
+        tag.innerText = "¡DESNATURALIZADA! Agregación Insoluble Irreversible";
+        tag.className = "text-xs font-semibold px-2 py-0.5 rounded bg-red-950 text-red-300 border border-red-800 animate-pulse";
+      }
+      drawDenatureVisual(denatureValue);
+    }
+
+    function resetDenaturation() {
+      const slider = document.getElementById('stress-slider');
+      if (slider) slider.value = 0;
+      updateDenaturation(0);
+    }
+
+    function drawDenatureVisual(stress) {
+      if (!denCtx || !denatureCanvas) return;
+      const w = denatureCanvas.width;
+      const h = denatureCanvas.height;
+      denCtx.clearRect(0, 0, w, h);
+
+      const cx = w / 2;
+      const cy = h / 2;
+      const factor = stress / 100;
+
+      // Dibujar cadena de aminoácidos
+      const numNodes = 40;
+      denCtx.lineWidth = 3;
+      denCtx.strokeStyle = factor > 0.6 ? '#ef4444' : '#008dda';
+      denCtx.beginPath();
+
+      for (let i = 0; i < numNodes; i++) {
+        // Coordenadas nativas (compacta y esferoidal)
+        const angle = (i / numNodes) * Math.PI * 4;
+        const nativeR = 45 + Math.sin(i * 1.5) * 25;
+        const nx = cx + Math.cos(angle) * nativeR;
+        const ny = cy + Math.sin(angle) * nativeR;
+
+        // Coordenadas desnaturalizadas (hebra caótica extendida y dispersa)
+        const dx = 40 + (i / numNodes) * (w - 80) + Math.sin(i * 3 + factor * 10) * (30 * factor);
+        const dy = cy + Math.cos(i * 2 + factor * 5) * (60 * factor);
+
+        // Interpolación lineal
+        const px = nx * (1 - factor) + dx * factor;
+        const py = ny * (1 - factor) + dy * factor;
+
+        if (i === 0) denCtx.moveTo(px, py);
+        else denCtx.lineTo(px, py);
+      }
+      denCtx.stroke();
+
+      // Dibujar residuos hidrofóbicos (Leu/Val/Phe en ámbar)
+      for (let j = 4; j < numNodes; j += 5) {
+        const angle = (j / numNodes) * Math.PI * 4;
+        const nativeR = 25; // En nativa están en el núcleo interno
+        const nx = cx + Math.cos(angle) * nativeR;
+        const ny = cy + Math.sin(angle) * nativeR;
+
+        const dx = 40 + (j / numNodes) * (w - 80) + Math.sin(j * 3 + factor * 10) * (30 * factor);
+        const dy = cy + Math.cos(j * 2 + factor * 5) * (60 * factor);
+
+        const px = nx * (1 - factor) + dx * factor;
+        const py = ny * (1 - factor) + dy * factor;
+
+        denCtx.beginPath();
+        denCtx.arc(px, py, 6, 0, Math.PI * 2);
+        denCtx.fillStyle = '#f59e0b';
+        denCtx.fill();
+        denCtx.strokeStyle = '#78350f';
+        denCtx.stroke();
+      }
+
+      // Rótulos informativos en canvas
+      denCtx.font = "11px Inter";
+      denCtx.fillStyle = "#94a3b8";
+      if (factor < 0.3) {
+        denCtx.fillText("Residuos hidrofóbicos (ámbar) secuestrados en el interior apolar", 16, 25);
+      } else {
+        denCtx.fillText("Exposición de parches hidrofóbicos al agua → Agregación coloidal precipitante", 16, 25);
+      }
+    }
+
+    // --- CASO CLÍNICO: ALCOHOL 70% VS 100% (MÓDULO 5) ---
+    let bacterialCanvas, bacCtx;
+    let alcoholSimulation = { conc: 0, progress: 0, interval: null };
+
+    function initBacterialCanvas() {
+      bacterialCanvas = document.getElementById('bacterialCanvas');
+      if (!bacterialCanvas) return;
+      bacCtx = bacterialCanvas.getContext('2d');
+      bacterialCanvas.width = bacterialCanvas.parentElement.clientWidth;
+      bacterialCanvas.height = 224;
+      drawBacteriaScene(0, 0);
+    }
+
+    function simulateAlcohol(conc) {
+      alcoholSimulation.conc = conc;
+      alcoholSimulation.progress = 0;
+      if (alcoholSimulation.interval) clearInterval(alcoholSimulation.interval);
+
+      const b70 = document.getElementById('btn-alc-70');
+      const b100 = document.getElementById('btn-alc-100');
+      if (conc === 70) {
+        b70.className = "px-3 py-1.5 rounded-lg bg-accent text-white font-bold text-xs hover:bg-accent-hover transition shadow";
+        b100.className = "px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition border border-slate-200";
+      } else {
+        b100.className = "px-3 py-1.5 rounded-lg bg-rose-600 text-white font-bold text-xs hover:bg-rose-700 transition shadow";
+        b70.className = "px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition border border-slate-200";
+      }
+
+      const status = document.getElementById('bacterial-status');
+
+      alcoholSimulation.interval = setInterval(() => {
+        alcoholSimulation.progress += 0.05;
+        if (alcoholSimulation.progress >= 1.0) {
+          alcoholSimulation.progress = 1.0;
+          clearInterval(alcoholSimulation.interval);
+          if (conc === 70) {
+            status.innerHTML = "<span class='text-emerald-400 font-bold'>¡ÉXITO BIOCIDA! El alcohol al 70% penetró y desnaturalizó las enzimas citoplasmáticas. Muerte bacteriana total.</span>";
+          } else {
+            status.innerHTML = "<span class='text-red-400 font-bold'>¡FALLA DE ANTISEPSIA! Coagulación periférica instantánea formando costra. La bacteria sobrevivió en su interior.</span>";
+          }
+        }
+        drawBacteriaScene(conc, alcoholSimulation.progress);
+      }, 40);
+    }
+
+    function drawBacteriaScene(conc, progress) {
+      if (!bacCtx || !bacterialCanvas) return;
+      const w = bacterialCanvas.width;
+      const h = bacterialCanvas.height;
+      bacCtx.clearRect(0, 0, w, h);
+
+      const cx = w / 2;
+      const cy = h / 2;
+      const rw = 90;
+      const rh = 45;
+
+      // 1. Pared Celular Externa
+      bacCtx.beginPath();
+      bacCtx.ellipse(cx, cy, rw, rh, 0, 0, Math.PI * 2);
+
+      if (conc === 100) {
+        // En 100%, la pared se coagula inmediatamente en una coraza oscura e impermeable
+        bacCtx.lineWidth = 10;
+        bacCtx.strokeStyle = progress > 0.2 ? '#991b1b' : '#38bdf8';
+        bacCtx.fillStyle = '#0f172a';
+        bacCtx.stroke();
+        bacCtx.fill();
+
+        // Enzimas internas intactas (verde = vivas)
+        bacCtx.fillStyle = '#10b981';
+        for (let i = -3; i <= 3; i++) {
+          bacCtx.beginPath();
+          bacCtx.arc(cx + i * 18, cy + (i % 2 === 0 ? 8 : -8), 5, 0, Math.PI * 2);
+          bacCtx.fill();
+        }
+      } else if (conc === 70) {
+        // En 70%, el alcohol penetra gradualmente al citoplasma
+        bacCtx.lineWidth = 6;
+        bacCtx.strokeStyle = '#38bdf8';
+        bacCtx.fillStyle = '#0f172a';
+        bacCtx.stroke();
+        bacCtx.fill();
+
+        // Difusión citoplasmática de etanol (halo cian que crece)
+        if (progress > 0) {
+          bacCtx.fillStyle = `rgba(6, 182, 212, ${progress * 0.4})`;
+          bacCtx.beginPath();
+          bacCtx.ellipse(cx, cy, rw * progress, rh * progress, 0, 0, Math.PI * 2);
+          bacCtx.fill();
+        }
+
+        // Enzimas internas: pasan de verde (activas) a gris opaco/rojo (desnaturalizadas)
+        for (let i = -3; i <= 3; i++) {
+          bacCtx.fillStyle = progress > 0.6 ? '#64748b' : '#10b981';
+          bacCtx.beginPath();
+          bacCtx.arc(cx + i * 18, cy + (i % 2 === 0 ? 8 : -8), 5, 0, Math.PI * 2);
+          bacCtx.fill();
+        }
+      } else {
+        // Estado basal sin alcohol
+        bacCtx.lineWidth = 6;
+        bacCtx.strokeStyle = '#0284c7';
+        bacCtx.fillStyle = '#0f172a';
+        bacCtx.stroke();
+        bacCtx.fill();
+
+        bacCtx.fillStyle = '#10b981';
+        for (let i = -3; i <= 3; i++) {
+          bacCtx.beginPath();
+          bacCtx.arc(cx + i * 18, cy + (i % 2 === 0 ? 8 : -8), 5, 0, Math.PI * 2);
+          bacCtx.fill();
+        }
+      }
+
+      // Rótulos explicativos
+      bacCtx.font = "11px Inter";
+      bacCtx.fillStyle = "#cbd5e1";
+      bacCtx.fillText(conc === 100 ? "Costra densa exterior impenetrable (Proteínas coaguladas)" : "Pared celular permeable al etanol hidratado", 15, 25);
+    }
+
+    // --- LABORATORIO DE AUTOEVALUACIÓN MÉDICA ---
+    const quizFeedback = {
+      1: {
+        correct: 'B',
+        textCorrect: "¡Excelente razonamiento biofísico! La ebullición desestabiliza los puentes de H y las interacciones hidrofóbicas terciarias, desmoronando la tríada catalítica del sitio activo. Los enlaces peptídicos requieren calor prolongado con ácido fuerte para romperse.",
+        textWrong: "Incorrecto. Los enlaces peptídicos son amidas estables que resisten el agua a 100°C; la estructura primaria no se fragmenta. El fallo es estrictamente conformacional tridimensional."
+      },
+      2: {
+        correct: 'A',
+        textCorrect: "¡Respuesta médica correcta! La ley de acción de masas fuerza la unión de H⁺ a los carboxilatos de Asp y Glu (-COO⁻ + H⁺ → -COOH), neutralizando su carga negativa y anulando instantáneamente los puentes salinos con residuos básicos (-NH₃⁺).",
+        textWrong: "Incorrecto. El enlace peptídico conserva su rigidez por resonancia independientemente de los protones libres. El colapso ocurre en los puentes salinos de la estructura terciaria."
+      },
+      3: {
+        correct: 'B',
+        textCorrect: "¡Brillante correlación con la patología nutricional! En la traducción ribosomal, si falta un aminoácido esencial para el cual existe un codón especificado, el complejo de elongación se detiene irremediablemente, impidiendo la síntesis de albúmina o hemoglobina.",
+        textWrong: "Incorrecto. Los ribosomas humanos no pueden improvisar ni reemplazar aminoácidos faltantes con glúcidos; se detiene la síntesis completa de la proteína diana."
+      }
+    };
+
+    function checkAnswer(qNum, selected) {
+      if (answeredQuestions[qNum]) return; // Evitar responder dos veces
+      answeredQuestions[qNum] = true;
+
+      const fbBox = document.getElementById(`q-feedback-${qNum}`);
+      fbBox.classList.remove('hidden');
+
+      const isCorrect = (selected === quizFeedback[qNum].correct);
+      if (isCorrect) {
+        quizScore++;
+        fbBox.className = "p-3 rounded-lg text-xs leading-relaxed bg-emerald-950/80 border border-emerald-800 text-emerald-200";
+        fbBox.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 mr-1.5"></i> ${quizFeedback[qNum].textCorrect}`;
+      } else {
+        fbBox.className = "p-3 rounded-lg text-xs leading-relaxed bg-red-950/80 border border-red-800 text-red-200";
+        fbBox.innerHTML = `<i class="fa-solid fa-circle-xmark text-red-400 mr-1.5"></i> ${quizFeedback[qNum].textWrong}`;
+      }
+
+      document.getElementById('quiz-score').innerText = `Puntuación: ${quizScore} / 3`;
+    }
+
+    // --- CARGA INICIAL TRAS WINDOW.LOAD ---
+    window.addEventListener('load', () => {
+      // Iniciar con Pilar 1 cargado
+      selectPillar(0);
+
+      // Renderizar KaTeX matemático y médico
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    });
+  </script>
+</body>
+</html>
